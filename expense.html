@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Expense Tracker</title>
+  </head>
+  <style>
+    body {
+      background-color: #121212;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .layout {
+      background-color: #1e1e1e;
+      width: 60%;
+      padding: 20px;
+      box-sizing: border-box;
+      border-right: 2px solid #2ecc71;
+      color: #ccc;
+    }
+
+    .monthly-expense {
+      background-color: #1e1e1e;
+      width: 40%;
+      padding: 20px;
+      box-sizing: border-box;
+      color: #2ecc71;
+      font-size: 22px;
+      border-left: 2px solid #2ecc71;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      background-color: #2c2c2c;
+      color: #2ecc71;
+      border: 2px solid #444;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+      width: calc(100% - 22px);
+      box-sizing: border-box;
+    }
+
+    #inputIncome {
+      width: 100%;
+    }
+
+    input::placeholder {
+      color: #2ecc71;
+    }
+
+    select {
+      width: 100%;
+    }
+
+    button {
+      background-color: #2ecc71;
+      color: #1e1e1e;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease-in-out;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background-color: #27ae60;
+    }
+
+    .subt-Btn {
+      width: 100%;
+    }
+
+    #showMonthlyExpense,
+    #showIncomeLeft {
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border: 1px solid #2ecc71;
+      text-align: center;
+      background-color: #2c2c2c;
+      color: #2ecc71;
+    }
+
+    .addTable,
+    .delTable {
+      width: 48%;
+      margin-top: 20px;
+    }
+
+    #convertedSalary,
+    #displayMonthlyExpense,
+    #displayIncomeLeft {
+      font-size: 22px;
+      font-weight: bold;
+      color: #2ecc71;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+  <body>
+    <div class="layout">
+      <input
+        type="text"
+        id="inputIncome"
+        placeholder="Monthly Income in Rupees"
+      />
+      <br />
+      <label id="selectType" name="category">Select Currency Type:</label>
+      <select id="conversionType" name="category">
+        <option value="Rupees">₹</option>
+        <option value="Dollars">$</option>
+        <option value="Pounds">£</option>
+        <option value="Euros">€</option>
+        <option value="AED">د.إ</option>
+      </select>
+      <button class="subt-Btn">Submit</button><br />
+      <pre id="convertedSalary"></pre>
+      <br />
+      <button id="showMonthlyExpense">Show Monthly Expense</button>
+      <pre id="displayMonthlyExpense"></pre>
+      <br />
+      <button id="showIncomeLeft">Show Monthly Income Left</button>
+      <pre id="displayIncomeLeft"></pre>
+    </div>
+    <div class="monthly-expense">
+      Your Monthly Expenses<br />
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="addList">
+          <tr>
+            <td><input type="date" class="addExpense" /></td>
+            <td>
+              <input type="text" class="addExpense" placeholder="e.g. Food" />
+            </td>
+            <td>
+              <input
+                type="number"
+                class="addExpense"
+                id="giveInput"
+                placeholder="Amount"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="addTable">Add Expense</button>
+      <button class="delTable">Delete</button>
+    </div>
+  </body>
+  <script>
+    const inputSalary = document.getElementById("inputIncome");
+    const selectConversionType = document.getElementById("conversionType");
+    const printConvertedSalary = document.getElementById("convertedSalary");
+    const submit = document.querySelector(".subt-Btn");
+    const inputExpense = document.getElementById("giveInput");
+    const table = document.querySelector(".addExpense");
+    const addTables = document.querySelector(".addTable");
+    const moreTable = document.getElementById("addList");
+    const deleteTable = document.querySelector(".delTable");
+    const showExpense = document.getElementById("showMonthlyExpense");
+    const displayExpense = document.getElementById("displayMonthlyExpense");
+    const calIncomeLeft = document.getElementById("showIncomeLeft");
+    const showIncomeLeft = document.getElementById("displayIncomeLeft");
+
+    inputSalary.style.backgroundColor = "grey";
+    inputSalary.style.color = "green";
+
+    function convertCurrency() {
+      const selectedvalue = selectConversionType.value;
+      const input = inputSalary.value.trim();
+      const income = parseFloat(input);
+      const code = input.charCodeAt(0);
+      if (!/^\d+(\.\d+)?$/.test(input)) {
+        printConvertedSalary.innerHTML = "❌ Please enter only numeric salary.";
+        return;
+      } else if (selectedvalue === "Rupees") {
+        printConvertedSalary.innerHTML = `Your Salary in Rupees is ₹${income}`;
+      } else if (selectedvalue === "Dollars") {
+        const convert = income / 83;
+        printConvertedSalary.innerHTML = `Your Salary in USD is $${convert}`;
+      } else if (selectedvalue === "Euros") {
+        const convert = income / 91;
+        printConvertedSalary.innerHTML = `Your Salary in Euros is €${convert}`;
+      } else if (selectedvalue === "AED") {
+        const convert = income / 22.5;
+        printConvertedSalary.innerHTML = `Your Salary in AED is د.إ ${convert}`;
+      } else if (selectedvalue === "Pounds") {
+        const convert = income / 107;
+        printConvertedSalary.innerHTML = `Your Salary in Pounds is £${convert}`;
+      }
+
+      printConvertedSalary.style.color = "green";
+      printConvertedSalary.style.marginTop = "10px";
+      printConvertedSalary.style.color = "green";
+      printConvertedSalary.style.fontSize = "25px";
+      printConvertedSalary.style.font = "bold";
+
+      placeHolder(selectedvalue);
+    }
+
+    function placeHolder(currency) {
+      let value = inputExpense.value;
+      let symbol = "";
+      if (currency === "Rupees") symbol = "₹";
+      else if (currency === "Dollars") symbol = "$";
+      else if (currency === "Euros") symbol = "€";
+      else if (currency === "AED") symbol = "د.إ";
+      else if (currency === "Pounds") symbol = "£";
+
+      inputExpense.placeholder = `${symbol}0.00`;
+    }
+
+    submit.addEventListener("click", convertCurrency);
+
+    addTables.addEventListener("click", (e) => {
+      const newRow = document.createElement("tr");
+      newRow.innerHTML = `
+    <td><input type="date" class="addExpense" /></td>
+    <td><input type="text" class="addExpense" placeholder="e.g. Food" /></td>
+    <td><input type="number" class="addExpense" placeholder="Amount" /></td>
+  `;
+      moreTable.appendChild(newRow);
+
+      if (moreTable.children.length > 9) {
+        addTables.disabled = true;
+        const alert = document.createElement("a");
+        alert.innerHTML = "No More Expenses Allowed";
+        alert.style.color = "red";
+        alert.style.display = "inline-block";
+        alert.style.fontStyle = "bold";
+        alert.style.fontSize = "20px";
+        moreTable.appendChild(alert);
+      }
+    });
+
+    deleteTable.addEventListener("click", () => {
+      const rows = moreTable.querySelector("tr");
+      const mssg = moreTable.querySelector("a");
+      rows.remove();
+      mssg.remove();
+    });
+
+    function calExpenses() {
+      const allInputs = document.querySelectorAll(".addExpense[type='number']");
+      let total = 0;
+      allInputs.forEach((input) => {
+        const value = parseFloat(input.value);
+        if (!isNaN(value)) {
+          total += value;
+        }
+      });
+
+      const currency = document.getElementById("conversionType").value;
+      let symbol = "";
+      if (currency === "Rupees") symbol = "₹";
+      else if (currency === "Dollars") symbol = "$";
+      else if (currency === "Euros") symbol = "€";
+      else if (currency === "AED") symbol = "د.إ";
+      else if (currency === "Pounds") symbol = "£";
+      displayExpense.innerHTML = `Your Monthly Expense is ${symbol}${total}`;
+      displayExpense.style.marginTop = "10px";
+      displayExpense.style.color = "green";
+      displayExpense.backgroundColor = "grey";
+      displayExpense.style.fontSize = "25px";
+      displayExpense.style.font = "bold";
+      displayExpense.style.textAlign = "center";
+    }
+
+    showExpense.addEventListener("click", calExpenses);
+
+    function calIncomeleft() {
+      const input = inputSalary.value.trim();
+      const income = parseFloat(input);
+      const allInputs = document.querySelectorAll(".addExpense[type='number']");
+      let total = 0;
+      allInputs.forEach((input) => {
+        const value = parseFloat(input.value);
+        if (!isNaN(value)) {
+          total += value;
+        }
+      });
+      const currency = document.getElementById("conversionType").value;
+      let symbol = "";
+      if (currency === "Rupees") symbol = "₹";
+      else if (currency === "Dollars") symbol = "$";
+      else if (currency === "Euros") symbol = "€";
+      else if (currency === "AED") symbol = "د.إ";
+      else if (currency === "Pounds") symbol = "£";
+
+      const IncomeLeft = income - total;
+
+      showIncomeLeft.innerHTML = `Monthly Income Left is ${symbol}${IncomeLeft}`;
+      showIncomeLeft.style.marginTop = "10px";
+      showIncomeLeft.style.color = "green";
+      showIncomeLeft.backgroundColor = "grey";
+      showIncomeLeft.style.fontSize = "25px";
+      showIncomeLeft.style.font = "bold";
+      showIncomeLeft.style.textAlign = "center";
+    }
+
+    calIncomeLeft.addEventListener("click", calIncomeleft);
+  </script>
+</html>
